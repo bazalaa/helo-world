@@ -1,0 +1,443 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "virtualMachines_KGB01_name": {
+            "defaultValue": "KGB01",
+            "type": "String"
+        },
+        "networkInterfaces_KGB01NIC01_name": {
+            "defaultValue": "KGB01NIC01",
+            "type": "String"
+        },
+        "routeTables_bautest_ukwest_udr_name": {
+            "defaultValue": "bautest-ukwest-udr",
+            "type": "String"
+        },
+        "availabilitySets_bautest_ukwest_as_name": {
+            "defaultValue": "bautest-ukwest-as",
+            "type": "String"
+        },
+        "virtualNetworks_bautest_ukwest_vnet_name": {
+            "defaultValue": "bautest-ukwest-vnet",
+            "type": "String"
+        },
+        "extensions_UKRegion_name": {
+            "defaultValue": "UKRegion",
+            "type": "String"
+        },
+        "routes_On_premise_name": {
+            "defaultValue": "On-premise",
+            "type": "String"
+        },
+        "routes_Override_Default_Route_name": {
+            "defaultValue": "Override-Default-Route",
+            "type": "String"
+        },
+        "subnets_bautest_ukwest_subnet_name": {
+            "defaultValue": "bautest-ukwest-subnet",
+            "type": "String"
+        },
+        "virtualNetworkPeerings_Link_BAUTest_UKWest_To_UKSouth_name": {
+            "defaultValue": "Link_BAUTest_UKWest_To_UKSouth",
+            "type": "String"
+        },
+        "virtualNetworkPeerings_Link_BAUTest_UKWest_To_Production_name": {
+            "defaultValue": "Link_BAUTest_UKWest_To_Production",
+            "type": "String"
+        },
+        "virtualMachines_KGB01_id": {
+            "defaultValue": "/subscriptions/100e68a6-78f6-4adb-8c1f-5c184d071df5/resourceGroups/bautest-ukwest-rg/providers/Microsoft.Compute/disks/KGB01OSDisk",
+            "type": "String"
+        },
+        "virtualNetworks_bautest_ukwest_vnet_id": {
+            "defaultValue": "/subscriptions/100e68a6-78f6-4adb-8c1f-5c184d071df5/resourceGroups/prod-vnet-ukwest-rg/providers/Microsoft.Network/virtualNetworks/Production",
+            "type": "String"
+        },
+        "virtualNetworks_bautest_ukwest_vnet_id_1": {
+            "defaultValue": "/subscriptions/100e68a6-78f6-4adb-8c1f-5c184d071df5/resourceGroups/bautest-uksouth-rg/providers/Microsoft.Network/virtualNetworks/bautest-uksouth-vnet",
+            "type": "String"
+        },
+        "virtualNetworkPeerings_Link_BAUTest_UKWest_To_Production_id": {
+            "defaultValue": "/subscriptions/100e68a6-78f6-4adb-8c1f-5c184d071df5/resourceGroups/prod-vnet-ukwest-rg/providers/Microsoft.Network/virtualNetworks/Production",
+            "type": "String"
+        },
+        "virtualNetworkPeerings_Link_BAUTest_UKWest_To_UKSouth_id": {
+            "defaultValue": "/subscriptions/100e68a6-78f6-4adb-8c1f-5c184d071df5/resourceGroups/bautest-uksouth-rg/providers/Microsoft.Network/virtualNetworks/bautest-uksouth-vnet",
+            "type": "String"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "comments": "Generalized from resource: '/subscriptions/100e68a6-78f6-4adb-8c1f-5c184d071df5/resourceGroups/bautest-ukwest-rg/providers/Microsoft.Compute/availabilitySets/bautest-ukwest-as'.",
+            "type": "Microsoft.Compute/availabilitySets",
+            "sku": {
+                "name": "Aligned"
+            },
+            "name": "[parameters('availabilitySets_bautest_ukwest_as_name')]",
+            "apiVersion": "2017-12-01",
+            "location": "ukwest",
+            "tags": {},
+            "scale": null,
+            "properties": {
+                "platformUpdateDomainCount": 5,
+                "platformFaultDomainCount": 2,
+                "virtualMachines": [
+                    {
+                        "id": "[resourceId('Microsoft.Compute/virtualMachines', parameters('virtualMachines_KGB01_name'))]"
+                    }
+                ]
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Compute/virtualMachines', parameters('virtualMachines_KGB01_name'))]"
+            ]
+        },
+        {
+            "comments": "Generalized from resource: '/subscriptions/100e68a6-78f6-4adb-8c1f-5c184d071df5/resourceGroups/bautest-ukwest-rg/providers/Microsoft.Compute/virtualMachines/KGB01'.",
+            "type": "Microsoft.Compute/virtualMachines",
+            "name": "[parameters('virtualMachines_KGB01_name')]",
+            "apiVersion": "2017-12-01",
+            "location": "ukwest",
+            "scale": null,
+            "properties": {
+                "availabilitySet": {
+                    "id": "[resourceId('Microsoft.Compute/availabilitySets', parameters('availabilitySets_bautest_ukwest_as_name'))]"
+                },
+                "hardwareProfile": {
+                    "vmSize": "Standard_DS3_v2"
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "MicrosoftWindowsServer",
+                        "offer": "WindowsServer",
+                        "sku": "2016-Datacenter",
+                        "version": "latest"
+                    },
+                    "osDisk": {
+                        "osType": "Windows",
+                        "name": "[concat(parameters('virtualMachines_KGB01_name'),'OSDisk')]",
+                        "createOption": "FromImage",
+                        "caching": "ReadWrite",
+                        "writeAcceleratorEnabled": false,
+                        "managedDisk": {
+                            "storageAccountType": "Premium_LRS",
+                            "id": "[parameters('virtualMachines_KGB01_id')]"
+                        },
+                        "diskSizeGB": 127
+                    },
+                    "dataDisks": []
+                },
+                "osProfile": {
+                    "computerName": "[parameters('virtualMachines_KGB01_name')]",
+                    "adminUsername": "fnietzsche",
+                    "windowsConfiguration": {
+                        "provisionVMAgent": true,
+                        "enableAutomaticUpdates": false
+                    },
+                    "secrets": []
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', parameters('networkInterfaces_KGB01NIC01_name'))]",
+                            "properties": {
+                                "primary": true
+                            }
+                        }
+                    ]
+                },
+                "diagnosticsProfile": {
+                    "bootDiagnostics": {
+                        "enabled": false
+                    }
+                }
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Compute/availabilitySets', parameters('availabilitySets_bautest_ukwest_as_name'))]",
+                "[resourceId('Microsoft.Network/networkInterfaces', parameters('networkInterfaces_KGB01NIC01_name'))]"
+            ]
+        },
+        {
+            "comments": "Generalized from resource: '/subscriptions/100e68a6-78f6-4adb-8c1f-5c184d071df5/resourceGroups/bautest-ukwest-rg/providers/Microsoft.Network/networkInterfaces/KGB01NIC01'.",
+            "type": "Microsoft.Network/networkInterfaces",
+            "name": "[parameters('networkInterfaces_KGB01NIC01_name')]",
+            "apiVersion": "2018-02-01",
+            "location": "ukwest",
+            "scale": null,
+            "properties": {
+                "provisioningState": "Succeeded",
+                "resourceGuid": "866716ac-d461-4e24-8ff7-a6d0ec77a084",
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "etag": "W/\"90f551cd-f40f-48d8-b197-b3031450c3ab\"",
+                        "properties": {
+                            "provisioningState": "Succeeded",
+                            "privateIPAddress": "10.160.1.11",
+                            "privateIPAllocationMethod": "Static",
+                            "subnet": {
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_bautest_ukwest_vnet_name'), parameters('subnets_bautest_ukwest_subnet_name'))]"
+                            },
+                            "primary": true,
+                            "privateIPAddressVersion": "IPv4"
+                        }
+                    }
+                ],
+                "dnsSettings": {
+                    "dnsServers": [],
+                    "appliedDnsServers": [],
+                    "internalDomainNameSuffix": "l4eb2kcdoswehm5rg3ke1thqle.cwx.internal.cloudapp.net"
+                },
+                "macAddress": "00-22-48-00-2E-EB",
+                "enableAcceleratedNetworking": true,
+                "enableIPForwarding": false,
+                "primary": true
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_bautest_ukwest_vnet_name'), parameters('subnets_bautest_ukwest_subnet_name'))]"
+            ]
+        },
+        {
+            "comments": "Generalized from resource: '/subscriptions/100e68a6-78f6-4adb-8c1f-5c184d071df5/resourceGroups/bautest-ukwest-rg/providers/Microsoft.Network/routeTables/bautest-ukwest-udr'.",
+            "type": "Microsoft.Network/routeTables",
+            "name": "[parameters('routeTables_bautest_ukwest_udr_name')]",
+            "apiVersion": "2018-02-01",
+            "location": "ukwest",
+            "scale": null,
+            "properties": {
+                "provisioningState": "Succeeded",
+                "disableBgpRoutePropagation": false,
+                "routes": [
+                    {
+                        "name": "On-premise",
+                        "etag": "W/\"2431b5ae-c35e-4c22-af6f-befc3e361796\"",
+                        "properties": {
+                            "provisioningState": "Succeeded",
+                            "addressPrefix": "10.0.0.0/8",
+                            "nextHopType": "VirtualAppliance",
+                            "nextHopIpAddress": "10.101.1.6"
+                        }
+                    },
+                    {
+                        "name": "Override-Default-Route",
+                        "etag": "W/\"2431b5ae-c35e-4c22-af6f-befc3e361796\"",
+                        "properties": {
+                            "provisioningState": "Succeeded",
+                            "addressPrefix": "0.0.0.0/0",
+                            "nextHopType": "VirtualAppliance",
+                            "nextHopIpAddress": "10.101.1.7"
+                        }
+                    }
+                ]
+            },
+            "dependsOn": []
+        },
+        {
+            "comments": "Generalized from resource: '/subscriptions/100e68a6-78f6-4adb-8c1f-5c184d071df5/resourceGroups/bautest-ukwest-rg/providers/Microsoft.Network/virtualNetworks/bautest-ukwest-vnet'.",
+            "type": "Microsoft.Network/virtualNetworks",
+            "name": "[parameters('virtualNetworks_bautest_ukwest_vnet_name')]",
+            "apiVersion": "2018-02-01",
+            "location": "ukwest",
+            "scale": null,
+            "properties": {
+                "provisioningState": "Succeeded",
+                "resourceGuid": "281e885f-7443-43ac-b3f1-37544dccf05c",
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "10.160.1.0/24"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "bautest-ukwest-subnet",
+                        "etag": "W/\"d186b5f2-548f-4049-9033-47ea4b327dce\"",
+                        "properties": {
+                            "provisioningState": "Succeeded",
+                            "addressPrefix": "10.160.1.0/24",
+                            "routeTable": {
+                                "id": "[resourceId('Microsoft.Network/routeTables', parameters('routeTables_bautest_ukwest_udr_name'))]"
+                            },
+                            "serviceEndpoints": []
+                        }
+                    }
+                ],
+                "virtualNetworkPeerings": [
+                    {
+                        "name": "Link_BAUTest_UKWest_To_Production",
+                        "etag": "W/\"d186b5f2-548f-4049-9033-47ea4b327dce\"",
+                        "properties": {
+                            "provisioningState": "Succeeded",
+                            "peeringState": "Connected",
+                            "remoteVirtualNetwork": {
+                                "id": "[parameters('virtualNetworks_bautest_ukwest_vnet_id')]"
+                            },
+                            "allowVirtualNetworkAccess": true,
+                            "allowForwardedTraffic": false,
+                            "allowGatewayTransit": false,
+                            "useRemoteGateways": false,
+                            "remoteAddressSpace": {
+                                "addressPrefixes": [
+                                    "10.101.0.0/17"
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        "name": "Link_BAUTest_UKWest_To_UKSouth",
+                        "etag": "W/\"d186b5f2-548f-4049-9033-47ea4b327dce\"",
+                        "properties": {
+                            "provisioningState": "Succeeded",
+                            "peeringState": "Connected",
+                            "remoteVirtualNetwork": {
+                                "id": "[parameters('virtualNetworks_bautest_ukwest_vnet_id_1')]"
+                            },
+                            "allowVirtualNetworkAccess": true,
+                            "allowForwardedTraffic": false,
+                            "allowGatewayTransit": false,
+                            "useRemoteGateways": false,
+                            "remoteAddressSpace": {
+                                "addressPrefixes": [
+                                    "10.160.2.0/24"
+                                ]
+                            }
+                        }
+                    }
+                ],
+                "enableDdosProtection": false,
+                "enableVmProtection": false
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/routeTables', parameters('routeTables_bautest_ukwest_udr_name'))]"
+            ]
+        },
+        {
+            "comments": "Generalized from resource: '/subscriptions/100e68a6-78f6-4adb-8c1f-5c184d071df5/resourceGroups/bautest-ukwest-rg/providers/Microsoft.Compute/virtualMachines/KGB01/extensions/UKRegion'.",
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "name": "[concat(parameters('virtualMachines_KGB01_name'), '/', parameters('extensions_UKRegion_name'))]",
+            "apiVersion": "2017-12-01",
+            "location": "ukwest",
+            "scale": null,
+            "properties": {
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                    "fileUris": [
+                        "https://cdtcustomscripts.blob.core.windows.net/regionscript/setregionengb.ps1",
+                        "https://cdtcustomscripts.blob.core.windows.net/regionscript/UKRegion.xml"
+                    ],
+                    "commandToExecute": "powershell -ExecutionPolicy Unrestricted -file setregionengb.ps1 "
+                },
+                "publisher": "Microsoft.Compute",
+                "type": "CustomScriptExtension",
+                "typeHandlerVersion": "1.4",
+                "protectedSettings": {}
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Compute/virtualMachines', parameters('virtualMachines_KGB01_name'))]"
+            ]
+        },
+        {
+            "comments": "Generalized from resource: '/subscriptions/100e68a6-78f6-4adb-8c1f-5c184d071df5/resourceGroups/bautest-ukwest-rg/providers/Microsoft.Network/routeTables/bautest-ukwest-udr/routes/On-premise'.",
+            "type": "Microsoft.Network/routeTables/routes",
+            "name": "[concat(parameters('routeTables_bautest_ukwest_udr_name'), '/', parameters('routes_On_premise_name'))]",
+            "apiVersion": "2018-02-01",
+            "scale": null,
+            "properties": {
+                "provisioningState": "Succeeded",
+                "addressPrefix": "10.0.0.0/8",
+                "nextHopType": "VirtualAppliance",
+                "nextHopIpAddress": "10.101.1.6"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/routeTables', parameters('routeTables_bautest_ukwest_udr_name'))]"
+            ]
+        },
+        {
+            "comments": "Generalized from resource: '/subscriptions/100e68a6-78f6-4adb-8c1f-5c184d071df5/resourceGroups/bautest-ukwest-rg/providers/Microsoft.Network/routeTables/bautest-ukwest-udr/routes/Override-Default-Route'.",
+            "type": "Microsoft.Network/routeTables/routes",
+            "name": "[concat(parameters('routeTables_bautest_ukwest_udr_name'), '/', parameters('routes_Override_Default_Route_name'))]",
+            "apiVersion": "2018-02-01",
+            "scale": null,
+            "properties": {
+                "provisioningState": "Succeeded",
+                "addressPrefix": "0.0.0.0/0",
+                "nextHopType": "VirtualAppliance",
+                "nextHopIpAddress": "10.101.1.7"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/routeTables', parameters('routeTables_bautest_ukwest_udr_name'))]"
+            ]
+        },
+        {
+            "comments": "Generalized from resource: '/subscriptions/100e68a6-78f6-4adb-8c1f-5c184d071df5/resourceGroups/bautest-ukwest-rg/providers/Microsoft.Network/virtualNetworks/bautest-ukwest-vnet/subnets/bautest-ukwest-subnet'.",
+            "type": "Microsoft.Network/virtualNetworks/subnets",
+            "name": "[concat(parameters('virtualNetworks_bautest_ukwest_vnet_name'), '/', parameters('subnets_bautest_ukwest_subnet_name'))]",
+            "apiVersion": "2018-02-01",
+            "scale": null,
+            "properties": {
+                "provisioningState": "Succeeded",
+                "addressPrefix": "10.160.1.0/24",
+                "routeTable": {
+                    "id": "[resourceId('Microsoft.Network/routeTables', parameters('routeTables_bautest_ukwest_udr_name'))]"
+                },
+                "serviceEndpoints": []
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworks_bautest_ukwest_vnet_name'))]",
+                "[resourceId('Microsoft.Network/routeTables', parameters('routeTables_bautest_ukwest_udr_name'))]"
+            ]
+        },
+        {
+            "comments": "Generalized from resource: '/subscriptions/100e68a6-78f6-4adb-8c1f-5c184d071df5/resourceGroups/bautest-ukwest-rg/providers/Microsoft.Network/virtualNetworks/bautest-ukwest-vnet/virtualNetworkPeerings/Link_BAUTest_UKWest_To_Production'.",
+            "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
+            "name": "[concat(parameters('virtualNetworks_bautest_ukwest_vnet_name'), '/', parameters('virtualNetworkPeerings_Link_BAUTest_UKWest_To_Production_name'))]",
+            "apiVersion": "2018-02-01",
+            "scale": null,
+            "properties": {
+                "provisioningState": "Succeeded",
+                "peeringState": "Connected",
+                "remoteVirtualNetwork": {
+                    "id": "[parameters('virtualNetworkPeerings_Link_BAUTest_UKWest_To_Production_id')]"
+                },
+                "allowVirtualNetworkAccess": true,
+                "allowForwardedTraffic": false,
+                "allowGatewayTransit": false,
+                "useRemoteGateways": false,
+                "remoteAddressSpace": {
+                    "addressPrefixes": [
+                        "10.101.0.0/17"
+                    ]
+                }
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworks_bautest_ukwest_vnet_name'))]"
+            ]
+        },
+        {
+            "comments": "Generalized from resource: '/subscriptions/100e68a6-78f6-4adb-8c1f-5c184d071df5/resourceGroups/bautest-ukwest-rg/providers/Microsoft.Network/virtualNetworks/bautest-ukwest-vnet/virtualNetworkPeerings/Link_BAUTest_UKWest_To_UKSouth'.",
+            "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
+            "name": "[concat(parameters('virtualNetworks_bautest_ukwest_vnet_name'), '/', parameters('virtualNetworkPeerings_Link_BAUTest_UKWest_To_UKSouth_name'))]",
+            "apiVersion": "2018-02-01",
+            "scale": null,
+            "properties": {
+                "provisioningState": "Succeeded",
+                "peeringState": "Connected",
+                "remoteVirtualNetwork": {
+                    "id": "[parameters('virtualNetworkPeerings_Link_BAUTest_UKWest_To_UKSouth_id')]"
+                },
+                "allowVirtualNetworkAccess": true,
+                "allowForwardedTraffic": false,
+                "allowGatewayTransit": false,
+                "useRemoteGateways": false,
+                "remoteAddressSpace": {
+                    "addressPrefixes": [
+                        "10.160.2.0/24"
+                    ]
+                }
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworks_bautest_ukwest_vnet_name'))]"
+            ]
+        }
+    ]
+}
